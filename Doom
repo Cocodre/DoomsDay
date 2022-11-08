@@ -1,0 +1,144 @@
+Month = ['Jan', 'Feb','Mar','Apr', 'May','Jun','Jul','Aug',"Sep","Oct",'Nov',"Dec"]
+Day = list(range(7))
+DayStri = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+MON = 0
+TUE = 1
+WED = 2
+THU = 3
+FRI = 4
+SAT = 5
+SUN = 6
+
+print("Only answer with numbers")
+m = int(input("What month? "))
+d = int(input("What day? "))
+yr = int(input("What Year? "))
+
+# x = input("Enter a date in the format mm,dd,yyyy:  ")
+
+#Functions
+def IsLeapYear(yr):
+  if (yr%400) + (yr%100) == 0:
+    return True
+  elif (yr%100) == 0:
+    return False
+  elif (yr%4) == 0:
+    return True
+  else:
+    return False
+
+def CenturyDay(yr):
+  remainder = yr%400
+  if remainder == 0:
+      return TUE
+  remainder = remainder//100
+  remainder *= -2
+  return Day[remainder + 1]
+
+def MonthDoomsDate(m, yr):
+  if m == 1:
+    Date = m+2
+  elif m == 2:
+    Date = 28
+  elif m in [4,6,8,10,12]:
+    Date = m
+  elif m in [9,11]:
+    Date = m - 4
+  elif m in [3,5,7]:
+    Date = m + 4
+  if IsLeapYear(yr) == True:
+    Date += 1
+  return Date
+
+def doomsDay(yr):
+  a = ((yr%100)//12)
+  b = ((yr%100)%12)
+  c = ((yr%100)%12//4)
+  day = (a+b+c)%7 + CenturyDay(yr)
+  return day%7
+
+def DeltaDay(d, yr, Date):
+  if IsLeapYear(yr) == True:
+    return (d - Date) + 1
+  elif IsLeapYear(yr) == False:
+    return (d-Date)
+
+def IsValidDate(m,d,yr):
+  if IsLeapYear(yr) == True:
+    if d in list(range(1,30)) and m == 2 and yr > 0: 
+      return True
+    elif d in list(range(1,32)) and m in [1,3,5,7,8,10,12] and yr > 0:
+      return True
+    elif d in list(range(1,31)) and m in [4,6,9,11] and yr > 0:
+      return True
+    else:
+      return False
+  elif IsLeapYear(yr) == False:
+    if d in list(range(1,29)) and m == 2 and yr > 0: 
+      return True
+    elif d in list(range(1,32)) and m in [1,3,5,7,8,10,12] and yr > 0:
+      return True
+    elif d in list(range(1,31)) and m in [4,6,9,11] and yr > 0:
+      return True
+    else:
+      return False
+
+#Test Functions:::
+
+if __name__ == "__main__":
+
+  def test_leap_year():
+      assert IsLeapYear(2000)
+      assert not IsLeapYear(2100)
+      assert not IsLeapYear(1800)
+      assert IsLeapYear(1804)
+      assert IsLeapYear(2004)
+      assert IsLeapYear(1892)
+      assert not IsLeapYear(2021)
+      print("Leap year tests passed")
+
+  def test_century_day():
+      assert CenturyDay(2000) == TUE
+      assert CenturyDay(1700) == SUN
+      assert CenturyDay(1800) == FRI
+      assert CenturyDay(1900) == WED
+      print("Century day tests passed")
+
+  def test_month_to_date():
+      assert MonthDoomsDate(1,2000) == 4
+      assert MonthDoomsDate(1,2001) == 3
+      assert MonthDoomsDate(2,1892) == 29
+      assert MonthDoomsDate(2,2001) == 28
+      print("Month to date tests passed")
+
+  def test_doomsday():
+      assert doomsDay(1892) == MON
+      assert doomsDay(1776) == THU
+      assert doomsDay(2005) == MON
+      assert doomsDay(2021) == SUN
+      print("Doomsday tests passed")
+
+  def test_is_valid_date():
+      assert not IsValidDate(1, 0, 1996)
+      assert IsValidDate(2, 29, 1996)
+      assert IsValidDate(12, 31, 5021)
+      assert IsValidDate(2, 3, 1900)
+      assert not IsValidDate(2, 29, 1900)
+      assert IsValidDate(2, 29, 2020)
+      assert not IsValidDate(20, 2, 1689)
+      assert IsValidDate(12, 3, 1582)
+      assert not IsValidDate(9, 32, 2021)
+
+      print("is_valid_date tests passed")
+
+  # test_leap_year()
+  # test_century_day()
+  # test_month_to_date()
+  # test_doomsday()
+  # test_is_valid_date()
+    
+if IsValidDate(m,d,yr) == True:
+  print(m,"/",d,"/",yr, "is a", DayStri[((d-MonthDoomsDate(m,yr))+doomsDay(yr))%7])
+else:
+  print("Invalid Date...")
+
